@@ -4,13 +4,7 @@ const bookForm = document.querySelector(".book-form");
 const saveNewBook = document.querySelector(".btn-save");
 const booksCard = document.querySelector(".books-card");
 const modal = document.querySelector(".modal");
-const toggleReadBtn = document.querySelector(".read");
-
-
-
-
-
-
+const removeBtn = document.getElementsByClassName(".delete");
 
 // Book Constructor:
 function Book(title, author, pages, read = false) {
@@ -22,21 +16,9 @@ function Book(title, author, pages, read = false) {
 
 // UI Tasks
 function displayBooks() {
-  const storedBooks = [
-    {
-      title: "The Hobbit",
-      author: "J.R.R. Tolkien",
-      pages: 670,
-      read: true
-    },
-    {
-      title: "My Brilliant Friend",
-      author: "Elena Ferrante",
-      pages: 436
-    }
-  ];
 
-  const books = storedBooks;
+
+  const books = getBooks();
 
 
   books.forEach((book) => addBookToLibrary(book));
@@ -67,13 +49,13 @@ function addBookToLibrary(book) {
          
         </div>
       <div class="d-grid gap-2 d-md-block m-auto my-2">
-        <button class="btn btn-primary delete" type="button">Remove</button>
-        <button class="btn btn-warning toggle-read" type="button">Read: Yes</button>
+        <button class="btn btn-warning delete" type="button">Remove</button>
+        
       </div>
         
       
     </div>
-  </div
+  </div>
     `;
 
   // Append newyly created card element to the container
@@ -92,6 +74,38 @@ function clearFormFields() {
   document.querySelector("#title").value = "";
   document.querySelector("#author").value = "";
   document.querySelector("#pages").value = "";
+}
+
+// Store Books Local Storage
+
+function getBooks() {
+  let books;
+  if (localStorage.getItem("books") === null) {
+    books = [];
+  } else {
+    books = JSON.parse(localStorage.getItem("books"));
+  }
+  return books;
+}
+
+function addBook(book) {
+  const books = getBooks();
+
+  books.push(book);
+
+  localStorage.setItem("books", JSON.stringify(books));
+}
+
+function removeBook(title) {
+  const books = getBooks();
+
+  books.forEach((book, index) => {
+    if (book.title === title) {
+      books.splice(index, 1);
+    }
+  });
+
+  localStorage.setItem("books", JSON.stringify(books))
 }
 
 
@@ -117,33 +131,25 @@ bookForm.addEventListener("submit", (e) => {
   // Add book to card
   addBookToLibrary(book);
 
+  // Add book to store
+  addBook(book);
+
 
   // Clear fields form
   clearFormFields();
 
 });
 
-
-
 // Event: Remove book
 booksCard.addEventListener("click", (e) => {
+  // Remove book from UI
   deleteBook(e.target)
+
+  // Remove book from UI
+
+  removeBook(e.target.textContent);
 
 })
 
-// Event: Toggle read button
-// EventHandler to toggle the read button.
-const toggleRead = document.getElementsByClassName("toggle-read");
-for (let i = 0; i < toggleRead.length; i++) {
-  toggleRead[i].addEventListener("click", () => {
-    if (toggleRead === "Read: Yes") {
-
-      toggleRead.innerText = "Read: No"
-    } else {
-
-      toggleRead.innerText = "Read: Yes"
-    }
-  })
-}
 
 
